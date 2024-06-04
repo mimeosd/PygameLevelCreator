@@ -33,6 +33,10 @@ class PictureDrawer(pygame.sprite.Sprite):
                 x = image_spacing
                 y += img.get_height() + image_spacing + 10
 
+        
+    def exporter(self):
+        return self.images_list
+
     def scale_image(self, img):
         if img.get_width() > self.holder_width - 10:
             scale_factor = (self.holder_width - 10) / img.get_width()
@@ -43,27 +47,51 @@ class PictureDrawer(pygame.sprite.Sprite):
     def update(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
-            self.scroll_offset = min(self.scroll_offset + self.scroll_speed, 0)
+            for rect in self.rects_list:
+                rect.y += self.scroll_speed
         if keys[pygame.K_DOWN]:
-            max_scroll = min(0, self.holder_height - (self.rects_list[-1].bottom + self.scroll_offset + 10))
-            self.scroll_offset = max(self.scroll_offset - self.scroll_speed, max_scroll)
+            for rect in self.rects_list:
+                rect.y -= self.scroll_speed
+
 
     def draw(self, surface: pygame.Surface):
-        # Draw "holder" of all items
         holder = pygame.Surface((self.holder_width, self.holder_height))
-        holder.fill((255, 122, 61))
+        holder.fill((255, 122, 61)) # orange
         holder_rect = holder.get_rect(topleft=(self.holder_x, self.holder_y))
 
         # Draw images on holder
         for i in range(len(self.images_list)):
             img_rect = self.rects_list[i].move(0, self.scroll_offset)
-            # if holder_rect.collidepoint(img_rect.topleft) or holder_rect.collidepoint(img_rect.bottomright):
-                # Draw gray square relative to the holder
-            gray_rect = pygame.Rect(img_rect.left - 5, img_rect.top - 5, img_rect.width + 10, img_rect.height + 10)
-            pygame.draw.rect(holder, (169, 169, 169), gray_rect.move(-gray_rect.left + img_rect.left, -gray_rect.top + img_rect.top))
-            # Draw image
             
-            holder.blit(self.images_list[i], (img_rect.left - self.holder_x, img_rect.top - self.holder_y))
+            gray_rect = pygame.Rect(img_rect.left - 5, img_rect.top - 5, img_rect.width + 10, img_rect.height + 10)
+            
+            holder.blit(self.images_list[i], self.rects_list[i])
 
-        # Blit holder to the main surface
+        
         surface.blit(holder, holder_rect.topleft)
+
+
+class ChosenPicture(pygame.sprite.Sprite):
+    def __init__(self, location_x, location_y, image=None) -> None:
+        super().__init__()
+        self.location_x = location_x
+        self.location_y = location_y
+        self.image = image
+        
+            
+
+    def update(self) -> None:
+        if self.image == None:
+            self.image = pygame.Surface((40, 40))
+            self.image.fill((200, 100, 50))
+            self.rect = self.image.get_rect(center=(self.location_x, self.location_y))
+        else:
+            self.image = self.image
+            self.rect = self.image.get_rect(center=(self.location_x, self.location_y))
+    
+    def state_setter(self):
+        self.image = None
+    
+    def draw(self, surface: pygame.Surface):
+        surface.blit(self.image, self.rect)
+        
