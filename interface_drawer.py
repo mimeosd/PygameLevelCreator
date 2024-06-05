@@ -2,7 +2,7 @@ import pygame
 from file_get_helper import find_png_images
 import constants
 
-def side_panel(surface: pygame.Surface, color: tuple, offset=0):
+def side_panel(surface: pygame.Surface, color: tuple, offset=0): # remove color parameter and make sure to clear it in main call
     main_holder = pygame.draw.rect(surface, (215, 0, 0), (constants.WIDTH - 350, 10, 330, constants.HEIGTH - 30), 5)
     
     all_cells = []
@@ -10,7 +10,7 @@ def side_panel(surface: pygame.Surface, color: tuple, offset=0):
     
     for row in range(15):
         for cell in range(6):
-            cell_rect = pygame.draw.rect(surface, (215, 0, 0), (850 + cell * 55, row * 55 + 10 + offset, 55, 55), 5)
+            cell_rect = pygame.draw.rect(surface, (215, 0, 0), (850 + cell * 55, row * 55 + 10 + offset, 55, 55))
             all_cells.append(cell_rect)
 
     for _index, _image in enumerate(all_images):
@@ -40,3 +40,55 @@ def selected_image(surface: pygame.Surface, img_path=None):
         img_rect = image.get_rect()
         img_rect.center = img_rect_border.center  # Center the image within the border
         surface.blit(image, img_rect)
+
+def level_size_value(surface: pygame.Surface, level_size_x: str, level_size_y: str):
+    font = pygame.font.Font(None, 22)
+    text_x = "Level size X: "
+    text_y = "Level size Y: "
+    font_surf_x = font.render(text_x, True, (255, 255, 255))
+    font_surf_y = font.render(text_y, True, (255, 255, 255))
+    font_rect_x = font_surf_x.get_rect()
+    font_rect_y = font_surf_y.get_rect()
+    
+    font_rect_x.topleft = (80, 750)
+    font_rect_y.topleft = (290, 750)
+    
+    # Draw the input boxes
+    input_box_x = pygame.Rect(font_rect_x.right + 10, font_rect_x.y, 100, 32)
+    input_box_y = pygame.Rect(font_rect_y.right + 10, font_rect_y.y, 100, 32)
+    pygame.draw.rect(surface, (255, 255, 255), input_box_x, 2)
+    pygame.draw.rect(surface, (255, 255, 255), input_box_y, 2)
+    
+    # Render the level sizes inside the input boxes
+    level_size_surf_x = font.render(level_size_x, True, (255, 255, 255))
+    level_size_surf_y = font.render(level_size_y, True, (255, 255, 255))
+    level_size_rect_x = level_size_surf_x.get_rect()
+    level_size_rect_y = level_size_surf_y.get_rect()
+    level_size_rect_x.topleft = (input_box_x.x + 5, input_box_x.y + 5)
+    level_size_rect_y.topleft = (input_box_y.x + 5, input_box_y.y + 5)
+    surface.blit(level_size_surf_x, level_size_rect_x)
+    surface.blit(level_size_surf_y, level_size_rect_y)
+    
+    surface.blit(font_surf_x, font_rect_x)
+    surface.blit(font_surf_y, font_rect_y)
+    
+    return input_box_x, input_box_y
+
+
+def draw_level_area(surface: pygame.Surface, rows: int, columns: int, img_path=None):
+    all_cells = []
+    size = 30
+    starting_value = (20, 20)
+
+    for r in range(rows):
+        for c in range(columns):
+            cell_rect = pygame.Rect(starting_value[0] + c * size + 5, starting_value[1] + r * size + 5, 30, 30)
+            if img_path:
+                image = pygame.image.load(img_path)
+                image = pygame.transform.scale(image, (30, 30))
+                surface.blit(image, cell_rect.topleft)
+            else:
+                pygame.draw.rect(surface, (255, 255, 255), cell_rect, 3)
+            all_cells.append(cell_rect)
+
+    return all_cells
