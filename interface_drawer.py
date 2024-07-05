@@ -53,7 +53,7 @@ def level_size_value(surface: pygame.Surface, level_size_x: str, level_size_y: s
     font_rect_x.topleft = (80, 750)
     font_rect_y.topleft = (290, 750)
     
-    # Draw the input boxes
+    # Drawing input boxes
     input_box_x = pygame.Rect(font_rect_x.right + 10, font_rect_x.y, 100, 32)
     input_box_y = pygame.Rect(font_rect_y.right + 10, font_rect_y.y, 100, 32)
     pygame.draw.rect(surface, (255, 255, 255), input_box_x, 2)
@@ -75,16 +75,19 @@ def level_size_value(surface: pygame.Surface, level_size_x: str, level_size_y: s
     return input_box_x, input_box_y
 
 
-def draw_level_area(surface: pygame.Surface, rows: int, columns: int, img_path=None):
+def draw_level_area(surface: pygame.Surface, rows: int, columns: int, cell_images=None):
     all_cells = []
     size = 30
     starting_value = (20, 20)
+    if cell_images is None:
+        cell_images = {}
 
     for r in range(rows):
         for c in range(columns):
             cell_rect = pygame.Rect(starting_value[0] + c * size + 5, starting_value[1] + r * size + 5, 30, 30)
-            if img_path:
-                image = pygame.image.load(img_path)
+            cell_pos = (r, c)
+            if cell_pos in cell_images and cell_images[cell_pos]:
+                image = pygame.image.load(cell_images[cell_pos])
                 image = pygame.transform.scale(image, (30, 30))
                 surface.blit(image, cell_rect.topleft)
             else:
@@ -92,3 +95,4 @@ def draw_level_area(surface: pygame.Surface, rows: int, columns: int, img_path=N
             all_cells.append(cell_rect)
 
     return all_cells
+
